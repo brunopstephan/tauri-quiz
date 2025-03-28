@@ -27,10 +27,14 @@ const buttonVariants = cva(
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
       },
+      animated: {
+        true: "hover:translate-y-[-4px] hover:shadow-[0_15px_6px_-5px_rgba(0,0,0,0.5)]",
+      }
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      animated: false,
     },
   }
 )
@@ -39,6 +43,7 @@ function Button({
   className,
   variant,
   size,
+  animated,
   asChild = false,
   ...props
 }: React.ComponentProps<"button"> &
@@ -50,7 +55,7 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, animated, className,}))}
       {...props}
     />
   )

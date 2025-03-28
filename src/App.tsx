@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import './main.css'
-import { Settings, Home, Quiz } from './pages';
+import { Settings, Home, Quiz, Collections } from './pages';
 import { BackToHome, Navbar } from './components';
 
 function App() {
@@ -15,6 +15,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/collections" element={<Collections />} />
           </Routes>
         </BrowserRouter>
       </div>
