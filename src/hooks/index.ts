@@ -1,2 +1,3 @@
-export * from './useCreateColletion'
-export * from './useGetColletions'
+export * from './useCreateCollection'
+export * from './useGetCollections'
+export * from './useDeleteCollection'

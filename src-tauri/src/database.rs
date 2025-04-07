@@ -31,6 +31,13 @@ pub fn insert_collection(conn: &Connection, name: &str) -> Result<usize> {
     conn.execute("INSERT INTO collections (name) VALUES (?1)", params![name])
 }
 
+pub fn delete_collection(conn: &Connection, collection_id: i32) -> Result<usize> {
+    conn.execute(
+        "DELETE FROM collections WHERE id = ?1",
+        params![collection_id],
+    )
+}
+
 pub fn get_collections(conn: &Connection) -> Result<Vec<(i32, String)>> {
     let mut stmt = conn.prepare("SELECT id, name FROM collections")?;
     let collection_iter = stmt.query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?;

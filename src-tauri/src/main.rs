@@ -18,6 +18,13 @@ fn create_collection(name: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn delete_collection(id: i32) -> Result<(), String> {
+    let conn = database::establish_connection().map_err(|e| e.to_string())?;
+    database::delete_collection(&conn, id).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
 fn list_collections() -> Result<Vec<(i32, String)>, String> {
     let conn = database::establish_connection().map_err(|e| e.to_string())?;
     database::get_collections(&conn).map_err(|e| e.to_string())
@@ -28,7 +35,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             create_tables,
             create_collection,
-            list_collections
+            list_collections,
+            delete_collection
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

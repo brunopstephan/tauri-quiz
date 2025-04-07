@@ -22,7 +22,7 @@ export function Collections() {
     <div className="flex flex-wrap gap-4 justify-center">
         {
             collections?.map((collection) => (
-                <Collection key={collection[0]} name={collection[1]} />
+                <Collection key={collection[0]} name={collection[1]} id={collection[0]} />
             ))
         }
     </div>

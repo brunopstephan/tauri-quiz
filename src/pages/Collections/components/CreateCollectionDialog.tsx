@@ -5,7 +5,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { CustomOpenDialog } from '@/components';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
 import { useCreateCollection } from '@/hooks';
 
 const ACCEPTED_MIME_TYPES = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
@@ -35,13 +34,13 @@ const collectionFilter = z.object({
     words: pdfFileSchema.optional(),
 })
 
-type CreateColletionDialogProps = {
+type CreateCollectionDialogProps = {
     children: React.ReactNode,
   }
   
 type CollectionFilter = z.infer<typeof collectionFilter>;
 
-export function CreateCollectionDialog({children}: CreateColletionDialogProps) {
+export function CreateCollectionDialog({children}: CreateCollectionDialogProps) {
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -66,12 +65,12 @@ export function CreateCollectionDialog({children}: CreateColletionDialogProps) {
 		}
 	}, [isOpen, clearFields])
 
-	const {mutateAsync: createColletionFn} = useCreateCollection()
+	const {mutateAsync: createCollectionFn} = useCreateCollection()
 
-    function handleCreateColletion(data: CollectionFilter) {
+    function handleCreateCollection(data: CollectionFilter) {
         console.log(data)
        
-		createColletionFn(data).then(() => {
+		createCollectionFn(data).then(() => {
 			setIsOpen(false)
 		}).catch((error) => {
 			console.error("Error creating collection:", error);
@@ -79,7 +78,7 @@ export function CreateCollectionDialog({children}: CreateColletionDialogProps) {
     }
 
     return <CustomOpenDialog trigger={children} title="Create Collection" isOpen={isOpen} setIsOpen={setIsOpen}>
-        <form onSubmit={handleSubmit(handleCreateColletion)} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit(handleCreateCollection)} className="flex flex-col gap-4">
         <div className="w-full flex flex-col space-y-2">
 					<label>Name</label>
 
