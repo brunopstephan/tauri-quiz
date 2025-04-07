@@ -13,7 +13,6 @@ export function Collections() {
         </div>
     }
     
-    console.log('AAAAAAAAAA',collections);
     return <div className="flex flex-col items-center gap-4">
     <h1 className="font-bold text-4xl">Collections</h1>
 
