@@ -5,6 +5,8 @@ import { Controller, useForm } from 'react-hook-form'
 import { CustomOpenDialog } from '@/components';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Upload } from 'lucide-react';
+import { useCreateCollection } from '@/hooks';
 
 const ACCEPTED_MIME_TYPES = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
 const ACCEPTED_FILE_EXTENSIONS = [".xlsx"]
@@ -30,8 +32,7 @@ const pdfFileSchema = z.custom<File>((file) => {
 
 const collectionFilter = z.object({
     name: z.string( { message: 'Name is required' }).min(1, { message: 'Name is required' }),
-    description: z.string().optional(),
-    words: pdfFileSchema,
+    words: pdfFileSchema.optional(),
 })
 
 type CreateColletionDialogProps = {
@@ -65,10 +66,16 @@ export function CreateCollectionDialog({children}: CreateColletionDialogProps) {
 		}
 	}, [isOpen, clearFields])
 
+	const {mutateAsync: createColletionFn} = useCreateCollection()
 
     function handleCreateColletion(data: CollectionFilter) {
         console.log(data)
        
+		createColletionFn(data).then(() => {
+			setIsOpen(false)
+		}).catch((error) => {
+			console.error("Error creating collection:", error);
+		})
     }
 
     return <CustomOpenDialog trigger={children} title="Create Collection" isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -95,27 +102,7 @@ export function CreateCollectionDialog({children}: CreateColletionDialogProps) {
 					)}
 				</div>
                 
-                <div className="flex w-full flex-col space-y-2">
-					<label>Description (optional)</label>
 
-					<Controller
-						name="description"
-						control={control}
-						render={({ field }) => (
-							<Input
-								{...field}
-								placeholder="Cool Collection"
-								className={errors?.description?.message && 'border-red-500'}
-								/* onChange={(e: ChangeEvent<HTMLInputElement>) => {
-									field.onChange(e)
-								}} */
-							/>
-						)}
-					/>
-					{errors.description && (
-						<span className="text-red-500">* {errors.description.message}</span>
-					)}
-				</div>
 
                 <div className="flex w-full flex-col space-y-2">
 					<label>Words</label>
@@ -126,7 +113,7 @@ export function CreateCollectionDialog({children}: CreateColletionDialogProps) {
 						render={({ field }) => (
 								<Input
 
-								className={errors?.description?.message && 'border-red-500'}
+								className={errors?.words?.message && 'border-red-500'}
 								type='file'
 								accept=".xlsx"
 								onBlur={field.onBlur}
