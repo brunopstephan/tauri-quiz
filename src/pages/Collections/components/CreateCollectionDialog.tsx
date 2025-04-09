@@ -1,11 +1,13 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { z } from 'zod'
+import {  z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { CustomOpenDialog } from '@/components';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCreateCollection } from '@/hooks';
+import * as XLSX from 'xlsx';
+
 
 const ACCEPTED_MIME_TYPES = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
 const ACCEPTED_FILE_EXTENSIONS = [".xlsx"]
@@ -31,7 +33,7 @@ const pdfFileSchema = z.custom<File>((file) => {
 
 const collectionFilter = z.object({
     name: z.string( { message: 'Name is required' }).min(1, { message: 'Name is required' }),
-    words: pdfFileSchema.optional(),
+    words: z.any().optional(),
 })
 
 type CreateCollectionDialogProps = {
@@ -67,12 +69,38 @@ export function CreateCollectionDialog({children}: CreateCollectionDialogProps) 
 
 	const {mutateAsync: createCollectionFn} = useCreateCollection()
 
+	
+
     function handleCreateCollection(data: CollectionFilter) {
         console.log(data)
+		
+		
+		if (data.words instanceof File) {
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				const fileContent = event.target?.result;
+				if (typeof fileContent === 'string') {
+					const rows = fileContent.split('\n').filter(row => row.trim() !== '');
+					const parsedWords = rows.map(row => {
+						const [word, definition] = row.split(',').map(cell => cell.trim());
+						return { word, definition };
+					});
+					console.log(parsedWords);
+					
+				}
+			};
+			reader.readAsText(data.words);
+		}
+		
        
 		createCollectionFn(data).then(() => {
 			setIsOpen(false)
-		}).catch((error) => {
+		}).
+		then(d => {
+			console.log(d);
+			
+		}) 
+		.catch((error) => {
 			console.error("Error creating collection:", error);
 		})
     }

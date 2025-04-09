@@ -12,7 +12,7 @@ export function useCreateCollection() {
     
     return useMutation({
         mutationFn: async (data: CreateCollectionProps) => {
-            await invoke ('create_collection', data)
+            return await invoke('create_collection', data)
         },
         onSuccess: () => {            
             queryClient.invalidateQueries({

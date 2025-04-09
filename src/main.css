@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -112,7 +114,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 font-['Noto_Sans_JP'];
   }
   body {
     @apply bg-neutral-800 text-neutral-100;
