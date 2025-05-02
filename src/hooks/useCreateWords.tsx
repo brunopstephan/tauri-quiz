@@ -17,10 +17,10 @@ export function useCreateWords() {
         mutationFn: async (data: CreateWordsProps) => {
             await Promise.all(
                 data.words.map(async (word) => {
-                    await invoke('create_word', {
+                    await invoke('insert_word', {
                         word: word.word,
                         definition: word.definition,
-                        collection_id: data.collection_id
+                        collectionId: data.collection_id
                     });
                 }
             ));

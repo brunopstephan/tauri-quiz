@@ -10,11 +10,19 @@ fn create_tables() -> Result<(), String> {
     Ok(())
 }
 
-#[tauri::command]
+/* #[tauri::command]
 fn create_collection(name: String) -> Result<(), String> {
     let conn = database::establish_connection().map_err(|e| e.to_string())?;
     database::insert_collection(&conn, &name).map_err(|e| e.to_string())?;
     Ok(())
+} */
+
+#[tauri::command]
+fn create_collection(name: String) -> Result<(i64, String), String> {
+    let conn = database::establish_connection().map_err(|e| e.to_string())?;
+    /* let collection_id =  *//* database::insert_collection(&conn, &name).map_err(|e| e.to_string())?; */
+    database::insert_collection(&conn, &name).map_err(|e| e.to_string())
+    /* Ok(collection_id) */
 }
 
 #[tauri::command]

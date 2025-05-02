@@ -27,9 +27,10 @@ pub fn create_tables(conn: &Connection) -> Result<()> {
     Ok(())
 }
 
-pub fn insert_collection(conn: &Connection, name: &str) -> Result<i64> {
+pub fn insert_collection(conn: &Connection, name: &str) -> Result<(i64, String)> {
     conn.execute("INSERT INTO collections (name) VALUES (?1)", params![name])?;
-    Ok(conn.last_insert_rowid())
+    let id = conn.last_insert_rowid();
+    Ok((id, name.to_string()))
 }
 
 pub fn delete_collection(conn: &Connection, collection_id: i32) -> Result<usize> {

@@ -1,6 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 
 
 @custom-variant dark (&:is(.dark *));
@@ -114,7 +114,9 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 font-['Noto_Sans_JP'];
+    border: var(--border);
+    outline: 50% var(--ring);
+    font-family: 'Noto Sans JP', sans-serif;
   }
   body {
     @apply bg-neutral-800 text-neutral-100;

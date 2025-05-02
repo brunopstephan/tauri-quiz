@@ -6,34 +6,32 @@ import { CustomOpenDialog } from '@/components';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCreateCollection } from '@/hooks';
-import * as XLSX from 'xlsx';
+import { useCreateWords } from '@/hooks/useCreateWords';
 
 
-const ACCEPTED_MIME_TYPES = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
-const ACCEPTED_FILE_EXTENSIONS = [".xlsx"]
+const ACCEPTED_MIME_TYPES = ["text/csv"]
+const ACCEPTED_FILE_EXTENSIONS = [".csv"]
 
+const csvFileSchema = z.custom<File>((file) => {
+	if (!(file instanceof File)) {
+		return false
+	}
 
-const pdfFileSchema = z.custom<File>((file) => {
-    if (!(file instanceof File)) {
-      return false
-}
-  
+	if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
+		return false
+	}
 
-    if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
-      return false
-    }
-  
-    const fileExtension = `.${file.name.split(".").pop()?.toLowerCase()}`
-    if (!ACCEPTED_FILE_EXTENSIONS.includes(fileExtension)) {
-      return false
-    }
-  
-    return true
-  }, "The file must be a valid xlsx file.")
+	const fileExtension = `.${file.name.split(".").pop()?.toLowerCase()}`
+	if (!ACCEPTED_FILE_EXTENSIONS.includes(fileExtension)) {
+		return false
+	}
+
+	return true
+}, "The file must be a valid csv file.")
 
 const collectionFilter = z.object({
-    name: z.string( { message: 'Name is required' }).min(1, { message: 'Name is required' }),
-    words: z.any().optional(),
+	name: z.string({ message: 'Name is required' }).min(1, { message: 'Name is required' }),
+	words: csvFileSchema,
 })
 
 type CreateCollectionDialogProps = {
@@ -68,12 +66,14 @@ export function CreateCollectionDialog({children}: CreateCollectionDialogProps) 
 	}, [isOpen, clearFields])
 
 	const {mutateAsync: createCollectionFn} = useCreateCollection()
+	const {mutateAsync: createWordsFn} = useCreateWords()
 
+
+	const [createdColletionId, setCreatedCollectionId] = useState<string | null>(null)
+	const [parsedWords, setParsedWords] = useState<{ word: string; definition: string }[]>([])	
 	
 
     function handleCreateCollection(data: CollectionFilter) {
-        console.log(data)
-		
 		
 		if (data.words instanceof File) {
 			const reader = new FileReader();
@@ -81,11 +81,10 @@ export function CreateCollectionDialog({children}: CreateCollectionDialogProps) 
 				const fileContent = event.target?.result;
 				if (typeof fileContent === 'string') {
 					const rows = fileContent.split('\n').filter(row => row.trim() !== '');
-					const parsedWords = rows.map(row => {
+					setParsedWords(rows.map(row => {
 						const [word, definition] = row.split(',').map(cell => cell.trim());
 						return { word, definition };
-					});
-					console.log(parsedWords);
+					}));
 					
 				}
 			};
@@ -93,17 +92,30 @@ export function CreateCollectionDialog({children}: CreateCollectionDialogProps) 
 		}
 		
        
-		createCollectionFn(data).then(() => {
+		createCollectionFn(data).then(async(d) => {
 			setIsOpen(false)
-		}).
-		then(d => {
-			console.log(d);
-			
-		}) 
+			const [id] = d as any[]
+			setCreatedCollectionId(id)
+		})
 		.catch((error) => {
 			console.error("Error creating collection:", error);
 		})
     }
+
+	useEffect(() => {
+		if (createdColletionId && parsedWords.length > 0) {			
+			createWordsFn({
+				collection_id: createdColletionId,
+				words: parsedWords
+			}).then(() => {
+				setCreatedCollectionId(null)
+				setParsedWords([])
+			})
+			.catch((error) => {
+				console.error("Error creating words:", error);
+			})
+		}
+	}, [createdColletionId, parsedWords])
 
     return <CustomOpenDialog trigger={children} title="Create Collection" isOpen={isOpen} setIsOpen={setIsOpen}>
         <form onSubmit={handleSubmit(handleCreateCollection)} className="flex flex-col gap-4">
@@ -142,7 +154,7 @@ export function CreateCollectionDialog({children}: CreateCollectionDialogProps) 
 
 								className={errors?.words?.message && 'border-red-500'}
 								type='file'
-								accept=".xlsx"
+								accept=".csv"
 								onBlur={field.onBlur}
 								name={field.name}
 								ref={field.ref}
