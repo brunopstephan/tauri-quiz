@@ -37,10 +37,7 @@ export function Quiz() {
 
         setCurrentQuestion((prev) => prev + 1)
 
-        
     }
-
-
 
     useEffect(() => {
         if(words === null) {
@@ -72,6 +69,18 @@ export function Quiz() {
            <Loader className="animate-spin" />
         </div>
     }
+
+    const questionList = questions?.map((question) => (
+        <Question
+            key={question.id}
+            word={question.word}
+            options={question.options}
+            onAnswer={handleAnswer}
+            id={question.id}
+            definition={question.definition}
+        />
+    ))
+
     return <div className="flex flex-col items-center gap-4">
         {
             words && questions
@@ -86,14 +95,8 @@ export function Quiz() {
                 </div>
                 {
                     currentQuestion <= questions.length - 1 ?
-                    <Question
-                    word={questions[currentQuestion].word}
-                    options={questions[currentQuestion].options}
-                    definition={questions[currentQuestion].definition}
-                    onAnswer={handleAnswer}
-                    id={questions[currentQuestion].id}
-                />
-                :
+                    questionList?.[currentQuestion]
+                : 
                 <>
                     <h1 className="text-2xl">Quiz finished!</h1>
                     <h2>
